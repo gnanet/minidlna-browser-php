@@ -1,0 +1,20 @@
+{
+    "name": "gnanet/minidlna-browser-php",
+    "description": "PHP app to browse the contents of a minidlna database, start with: composer run-now",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gergely Nagy",
+            "email": "gna@r-us.hu"
+        }
+    ],
+    "require": {
+        "symfony/dotenv": "^5.4",
+        "steampixel/simple-php-router": "^0.7.0",
+        "twig/twig": "^3.0"
+    },
+   "scripts": {
+        "run-now": "php -S 0.0.0.0:8290 browser.php"
+    }
+}
