@@ -4,7 +4,7 @@ A basic PHP app with bootstrap template to browse the contents of a miniDLNA dat
 
 ## Prerequisites
 
-You will need at least PHP 7.x, php-cli with sqlite3 support, and composer on the machine where your miniDLNA runs
+You will need at least PHP 8.x, php-cli with sqlite3 support, and composer on the machine where your miniDLNA runs
 
 ## Installation
 
@@ -20,6 +20,7 @@ You will need at least PHP 7.x, php-cli with sqlite3 support, and composer on th
     ROOT_ID='64'
     PFW_URL=''
     PFW_CMD=''
+    MPV_PLAY_URI=0
     ```
 
     **Optional:** If `PFW_CMD` and `PFW_URL` is set, additional info and clipboard link is shown below video-items.
@@ -30,7 +31,21 @@ You will need at least PHP 7.x, php-cli with sqlite3 support, and composer on th
     ROOT_ID='64'
     PFW_URL='http://127.0.0.1:8201/MediaItems/'
     PFW_CMD='ssh -L L8201:IP-ADDRESS-TO-MINIDLNA:8200 your-ssh-user@your-gateway-host-to-minidlna'
+    MPV_PLAY_URI=0
     ```
+
+    **Optional:** with `MPV_PLAY_URI` set to `1`, you can enable a custom-uri scheme, and display the respective urls, which allows calling mpv for playback directly from the browser
+    **NOTE:** This works on moderately recent versions of Linux, you will need to install `mpv`, and add `scripts/mpv-handler.desktop` to your `~/.local/share/applications`, and place `scripts/mpv-handler.sh` into `/usr/local/bin/`
+
+    ```
+    DATABASE='path-to-the-location-of/files.db'
+    BASE_URL ='http://IP-ADDRESS-TO-MINIDLNA:8200/MediaItems/'
+    ROOT_ID='64'
+    PFW_URL=''
+    PFW_CMD=''
+    MPV_PLAY_URI=1
+    ```
+
 3. Use composer to install the required dependencies:
     ```
     $ composer install
@@ -40,11 +55,11 @@ You will need at least PHP 7.x, php-cli with sqlite3 support, and composer on th
 
 1. Start the app with the built-in server of PHP (usually this app should only be used by you) :
     ```
-    $ php -S 0.0.0.0:8290 browser.php
+    $ php -S 0.0.0.0:8299 browser.php
     ```
 2. Navigate to the URL, replace `IP-ADDRESS-TO-MINIDLNA` with the IP address of your miniDLNA server
     ```
-    http://IP-ADDRESS-TO-MINIDLNA:8290/
+    http://IP-ADDRESS-TO-MINIDLNA:8299/
     ```
 3. Navigate trough the folders structure, to see the content list of the miniDLNA server.
 
