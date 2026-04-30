@@ -1,12 +1,11 @@
 <?php
-
-
 /*
  * MiniDLNA Database Browser
  *
  * Author: Gergely Nagy <gna@r-us.hu>
  * URL: https://github.com/gnanet/minidlna-browser-php
  *
+ * Runs and tested with PHP8.3
  */
 
 define('BASEPATH', __DIR__);
@@ -60,47 +59,44 @@ $twig = new \Twig\Environment($loader, [
     'cache' => false,
 ]);
 
-
 function filesizeformat($bytes, $binary = false) {
     $unit     = 'Byte';
     $prefix   = '';
     $bytes    = (float)$bytes;
     $base     = $binary ? 1024 : 1000;
     $prefixes = array('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y');
-
     if ($bytes == 1) {
         return '1 Byte';
     } elseif ($bytes < $base) {
         return $bytes . ' Bytes';
     }
-
     foreach ($prefixes as $i => $prefix) {
         $unit = pow($base, ($i + 2));
         if ($bytes < $unit) {
             return sprintf('%.1f %s', ($base * $bytes / $unit), $prefix . ($binary ? 'iB' : 'B'));
         }
     }
-
     return sprintf('%.1f %s', ($base * $bytes / $unit), $prefix . ($binary ? 'iB' : 'B'));
 }
-
 
 function browse($object_id = NULL) {
     global $app_config, $twig;
     $db = new SQLite3($app_config['DATABASE'], SQLITE3_OPEN_READONLY );
     $root_path = $db->querySingle("SELECT VALUE FROM SETTINGS WHERE KEY = 'media_dir'");
-    $items = array();
-    $template_vars = array();
+    $items = [];
+    $template_vars = [];
+    $breadcrumb_ids = [];
+    $breadcrumbs_string="";
     if (( $object_id == NULL ) || ( $object_id == $app_config['ROOT_ID'] )) {
         $object_id = $app_config['ROOT_ID'];
         $path_array = array( 'PARENT_ID' => NULL, 'PATH' => NULL);
     } else {
         $path_array = $db->querySingle('select PARENT_ID, PATH FROM OBJECTS JOIN DETAILS ON OBJECTS.DETAIL_ID=DETAILS.ID WHERE OBJECT_ID = "'. $object_id.'"', true);
-        $breadcrumb_ids=[];
-        $path_elements=explode('$',$object_id);
-        $path_elements_cnt=count($path_elements);
-        $rpath_elements=array_reverse($path_elements);
-        $ei=1;
+        // Start making crumbles from bread
+        $path_elements = explode('$',$object_id);
+        $path_elements_cnt = count($path_elements);
+        $rpath_elements = array_reverse($path_elements);
+        $ei = 1; // skip the "home" item
         while ($ei < $path_elements_cnt ) {
             $breadcrumb_ids[] = urlencode(implode('$',$path_elements));
             array_pop($path_elements);
@@ -109,7 +105,7 @@ function browse($object_id = NULL) {
         $breadcrumb_ids=array_reverse($breadcrumb_ids);
         $path_elements_title = explode("/",str_replace($root_path."/","",$path_array['PATH']));
         $breadcrumbs = array_combine($breadcrumb_ids,$path_elements_title);
-        $breadcrumbs_string="";
+        // build the HTML code-snippet for breadcrumbs
         foreach ( $breadcrumbs as $crumb_id => $crumb_title ) {
             $breadcrumbs_string .= '            <li class="breadcrumb-item';
             if ( urlencode($object_id) == $crumb_id ) { $breadcrumbs_string .= " active"; }
@@ -121,9 +117,9 @@ function browse($object_id = NULL) {
             }
             $breadcrumbs_string .= '            </li>'.PHP_EOL;
         }
+        // Finish building breadcrumbs
     }
-
-
+    // build the media items of the current folder
     $cur = $db->query('select OBJECTS.ID, CLASS, OBJECT_ID, NAME, PATH, TITLE, MIME, SIZE, DURATION, DETAIL_ID FROM OBJECTS JOIN DETAILS ON OBJECTS.DETAIL_ID=DETAILS.ID WHERE PARENT_ID="'.$object_id.'" ORDER BY CLASS ASC, NAME ASC, OBJECT_ID ASC');
     while ($item = $cur->fetchArray()) {
         $item = array_change_key_case($item);
@@ -131,7 +127,7 @@ function browse($object_id = NULL) {
         $item['filesizeformat'] = filesizeformat($item['size']);
         $items[] = $item;
     }
-
+    // set template variables
     $template_vars = array(
         'root_path' => $root_path,
         'parent_id' => $path_array['PARENT_ID'],
@@ -144,23 +140,23 @@ function browse($object_id = NULL) {
         'PFW_URL' => $app_config['PFW_URL'],
         'PFW_CMD' => $app_config['PFW_CMD'],
     );
-
+    // Render the result using twig
     return $twig->render('browse.twig.html', $template_vars);
 }
 
-
 // build routes
+
+// home
 Route::add('/', function() {
     global $app_config, $twig;
     return browse();
 });
 
+// browse folders
 Route::add('/browse/(.*)', function($object_id) {
     global $app_config, $twig;
     return browse($object_id);
 });
 
-
 // Run the router
 Route::run('/');
-
