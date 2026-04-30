@@ -26,12 +26,14 @@
 <div class="container flex-grow-1 light-style container-p-y">
     <div class="container-m-nx container-m-ny bg-lightest mb-3">
         <ol class="breadcrumb text-big container-p-x py-3 m-0">
-{% if parent_id %}            <li class="breadcrumb-item">
+{% if parent_id %}
+            <li class="breadcrumb-item">
                 <a href="/browse/{{ root_id | url_encode }}/" data-minidlna-object-id="{{ root_id }}"><div class="fas fa-home"></div></a>
             </li>
-            <li class="breadcrumb-item">
-                {% autoescape false %}{{ breadcrumbs }}{% endautoescape %}
-            </li>{% else %}            <li class="breadcrumb-item active">MiniDLNA Database Browser ( {{ root_path }} )</li>{% endif %}
+            {% autoescape false %}{{ breadcrumbs }}{% endautoescape %}
+{% else %}
+            <li class="breadcrumb-item active">MiniDLNA Database Browser ( {{ root_path }} )</li>
+{% endif %}
         </ol>
         <hr class="m-0" />
     </div>
@@ -40,52 +42,89 @@
             <div class="file-item-name pb-2">Filename</div>
             <div class="file-item-changed pb-2">Info</div>
         </div>
-{% if parent_id %}        <div class="file-item">
+{% if parent_id %}
+        <div class="file-item">
+            <a href="/browse/{{ parent_id | url_encode }}/" data-minidlna-object-id="{{ parent_id }}">
             <div class="file-item-icon file-item-level-up fas fa-level-up-alt text-secondary"></div>
+            </a>
             <a href="/browse/{{ parent_id | url_encode }}/" data-minidlna-object-id="{{ parent_id }}" class="file-item-name">
                 ..
             </a>
-        </div>{% endif %}
-{% for item in items %}{% if item.class starts with 'container' %}        <div class="file-item">
+        </div>
+{% endif %}
+{% for item in items %}{% if item.class starts with 'container' %}
+        <div class="file-item">
             <div class="file-item-select-bg bg-primary"></div>
+            <a href="/browse/{{ item.object_id | url_encode }}/" data-minidlna-object-id="{{ item.object_id }}">
             <div class="file-item-icon far fa-folder text-secondary"></div>
+            </a>
             <a href="/browse/{{ item.object_id | url_encode }}/" data-minidlna-object-id="{{ item.object_id }}" class="file-item-name">
                 {{ item.name }}
             </a>
-        </div>{% elseif item.class starts with 'item.videoItem' %}        <div class="file-item">
+        </div>
+{% elseif item.class starts with 'item.videoItem' %}
+        <div class="file-item">
             <div class="file-item-select-bg bg-primary"></div>
             <div class="file-item-icon far fa-file-video text-secondary"></div>
             <div class="file-item-name">
                 <a href="javascript:void(0)" >
                     {{ item.basename }} [ {{ item.mime }} ]
                 </a>
-                <div><div id="clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"></div>Media-URL: {{ BASE_URL }}{{ item.detail_id }} <strong><span id="clip_{{ item.detail_id }}_status"></span></strong></div>
-{% if PFW_CMD %}                <div><div id="pfw_clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ PFW_URL }}{{ item.detail_id }}"></div>Portforwarded-URL: {{ PFW_URL }}{{ item.detail_id }} <strong><span id="pfw_clip_{{ item.detail_id }}_status"></span></strong></div>
+                <div>
+                    <div id="clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"></div>
+                    Media-URL: {{ BASE_URL }}{{ item.detail_id }} <strong><span id="clip_{{ item.detail_id }}_status"></span></strong>
+                </div>
+{% if MPV_PLAY_URI == 1 %}
+                <div>
+                <a href="mpv{{ BASE_URL | slice(4) }}{{ item.detail_id }}">
+                    <div id="mpv_{{ item.detail_id }}" class="fa fa-solid fa-play-circle text-secondary" ></div>
+                </a>
+                <a href="mpv{{ BASE_URL | slice(4) }}{{ item.detail_id }}">
+                    Play in mpv: {{ BASE_URL }}{{ item.detail_id }}
+                </a>
+                </div>
+{% endif %}
+
+{% if PFW_CMD %}
+                <div><div id="pfw_clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ PFW_URL }}{{ item.detail_id }}"></div>Portforwarded-URL: {{ PFW_URL }}{{ item.detail_id }} <strong><span id="pfw_clip_{{ item.detail_id }}_status"></span></strong></div>
                 <div class="clip-indented">Portforward command:</div>
-                <div class="clip-indented">{{ PFW_CMD }}</div>{% endif %}
+                <div class="clip-indented">{{ PFW_CMD }}</div>
+{% endif %}
             </div>
             <div class="file-item-changed">{{ item.filesizeformat }} | {{ item.duration }}</div>
-        </div>{% elseif item.class starts with 'item.audioItem' %}        <div class="file-item">
+        </div>
+{% elseif item.class starts with 'item.audioItem' %}
+        <div class="file-item">
             <div class="file-item-select-bg bg-primary"></div>
             <div class="file-item-icon far fa-file-audio text-secondary"></div>
             <div class="file-item-name">
                 <a href="javascript:void(0)" >
                     {{ item.basename }} [ {{ item.mime }} ]
                 </a>
-                <div><div id="clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"></div>Media-URL: {{ BASE_URL }}{{ item.detail_id }} <strong><span id="clip_{{ item.detail_id }}_status"></span></strong></div>
+                <div>
+                    <div id="clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"></div>
+                    Media-URL: {{ BASE_URL }}{{ item.detail_id }} <strong><span id="clip_{{ item.detail_id }}_status"></span></strong>
+                </div>
             </div>
             <div class="file-item-changed">{{ item.filesizeformat }} | {{ item.duration }}</div>
-        </div>{% else %}        <div class="file-item">
+        </div>
+{% else %}
+        <div class="file-item">
             <div class="file-item-select-bg bg-primary"></div>
             <div class="file-item-icon far fa-file text-secondary"></div>
             <div class="file-item-name">
                 <a href="javascript:void(0)" >
                     {{ item.basename }} [ {{ item.mime }} ]
                 </a>
-                <div><div id="clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"></div>Media-URL: {{ BASE_URL }}{{ item.detail_id }} <strong><span id="clip_{{ item.detail_id }}_status"></span></strong></div>
+                <div>
+                    <div id="clip_{{ item.detail_id }}" class="far fa-clipboard text-secondary clipbtn" data-clipboard-text="{{ BASE_URL }}{{ item.detail_id }}"></div>
+                    Media-URL: {{ BASE_URL }}{{ item.detail_id }} <strong><span id="clip_{{ item.detail_id }}_status"></span></strong>
+                </div>
             </div>
             <div class="file-item-changed">{{ item.filesizeformat }}</div>
-        </div>{% endif %}{% endfor %}
+        </div>
+{% endif %}
+{% endfor %}
     </div>
     <div class="container-m-nx container-m-ny bg-lightest mb-3">
         <hr class="m-0" />

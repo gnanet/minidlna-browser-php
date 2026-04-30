@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Icon[it]=mpv
+Name[it]=MPV handler
+Exec=/usr/local/bin/mpv-handler.sh %u
+Name=MPV handler
+Icon=mpv
+MimeType=x-scheme-handler/mpv;x-scheme-handler/mpvs
