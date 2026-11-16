@@ -1,0 +1,12 @@
+setuid = UNPRIVILEGED_USER
+setgid = UNPRIVILEGED_GROUP
+debug = notice
+pid = PROJECT_BASEDIR/stunnel.pid
+output = PROJECT_BASEDIR/stunnel.log
+
+[https]
+accept  = LOCAL_IP:8291
+connect = LOCAL_IP:8290
+cert = PROJECT_BASEDIR/HOSTNAME.pem
+TIMEOUTclose = 0
+debug = crit
