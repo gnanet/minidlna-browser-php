@@ -81,7 +81,7 @@ You will need at least PHP 8.x, php-cli with sqlite3 support, and composer on th
 > If copy-to-clipboard works, then you dont need to create a certificate for https, possible a self-signed, having to add the signer-cert as trusted CA.
 
 0. Set-up the SSL wrapper
-  0.1 Copy `PROJECT_BASEDIR/stunnel.conf.example` to `PROJECT_BASEDIR/stunnel.conf`
+    1. Copy `PROJECT_BASEDIR/stunnel.conf.example` to `PROJECT_BASEDIR/stunnel.conf`
 
     Fill applicable values:
     - usually on a raspberry-pi the `UNPRIVILEGED_USER` + `UNPRIVILEGED_GROUP` will be `pi`
@@ -103,7 +103,7 @@ You will need at least PHP 8.x, php-cli with sqlite3 support, and composer on th
     debug = crit
     ```
 
-  0.2 Start the stunnel
+    2. Start the stunnel
 
     ```
     stunnel4 PROJECT_BASEDIR/stunnel.conf
