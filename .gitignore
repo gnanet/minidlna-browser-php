@@ -2,3 +2,9 @@
 /assets/
 .env
 composer.lock
+*.pem
+*.crt
+stunnel.conf
+stunnel.pid
+stunnel.log
+
