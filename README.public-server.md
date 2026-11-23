@@ -11,24 +11,25 @@
 
 ## Pre-requisite configurations and installs
 
-1. Block SSDP (UPnP Discovery) Multicast, to prevent the single server setup leaking information
-  <sup><sub>initial idea source: https://oneuptime.com/blog/post/2026-03-20-block-unnecessary-broadcast-firewall-rules/view#block-ssdp-upnp-discovery-multicast</sub></sup>
+### 1. Block SSDP (UPnP Discovery) Multicast, to prevent the single server setup leaking information
 
-  A. Using iptables in rules.v4
+    <sup><sub>initial idea source: https://oneuptime.com/blog/post/2026-03-20-block-unnecessary-broadcast-firewall-rules/view#block-ssdp-upnp-discovery-multicast</sub></sup>
+
+    A. Using iptables in rules.v4
 
     ```
     -A INPUT -i eno1 -p udp --dport 1900 -d 239.255.255.250 -j DROP -m comment --comment "block ssdp multicast in"
     -A OUTPUT -p udp --dport 1900 -d 239.255.255.250 -j DROP -m comment --comment "block ssdp multicast out"
     ```
 
-  B. Using nftables
+    B. Using nftables
 
     ```
     nft add rule inet filter input [position 1] udp dport 1900 drop comment "block ssdp multicast in"
     nft add rule inet filter output [position 1] udp dport 1900 accept comment "block ssdp multicast out"
     ```
 
-2. Install and configure minidlna with the public fqdn hostname
+### 2. Install and configure minidlna with the public fqdn hostname
 
     ```
     apt install minidlna
@@ -44,7 +45,7 @@
     ```
 
 
-3. Issue a certificate using acme.sh for @@fqdn-for-minidlna-browser@@ and install the certificate to nginx
+### 3. Issue a certificate using acme.sh for @@fqdn-for-minidlna-browser@@ and install the certificate to nginx
 
     ```
     export APP_DOMAIN=@@fqdn-for-minidlna-browser@@
@@ -53,10 +54,11 @@
     mkdir -p /etc/nginx/ssl/${APP_DOMAIN}; /root/.acme.sh/acme.sh --install-cert -d ${APP_DOMAIN} --cert-file /etc/nginx/ssl/${APP_DOMAIN}/cert.pem --key-file /etc/nginx/ssl/${APP_DOMAIN}/privkey.pem --fullchain-file /etc/nginx/ssl/${APP_DOMAIN}/fullchain.pem --reloadcmd "/usr/sbin/nginx -t > /dev/null 2>&1 && /usr/sbin/nginx -s reload || exit 1"
     ```
 
-4. Create nginx configurations, one for proxying minidlna presentation port 8200, and a proxy for fqdn-for-minidlna-browser app, with a LetsEncrypt SSL cert
+### 4. Create nginx configurations, one for proxying minidlna presentation port 8200, and a proxy for fqdn-for-minidlna-browser app, with a LetsEncrypt SSL cert
 
-### Create an nginx proxy for the DMS into sites-available/@@fqdn-for-minidlna-dms@@.conf
-  <sup><sub>based on source: https://www.selfhostedninja.com/minidlna-a-beginner-friendly-guide-to-self-hosting/ </sub></sup>
+Create an nginx proxy for the DMS into sites-available/@@fqdn-for-minidlna-dms@@.conf
+
+    <sup><sub>based on source: https://www.selfhostedninja.com/minidlna-a-beginner-friendly-guide-to-self-hosting/ </sub></sup>
 
 ```
 server {
@@ -75,7 +77,7 @@ server {
 }
 ```
 
-### Create an nginx proxy for the minidlna-browser-php app into sites-available/@@fqdn-for-minidlna-browser@@.conf
+Create an nginx proxy for the minidlna-browser-php app into sites-available/@@fqdn-for-minidlna-browser@@.conf
 
 ```
 server {
@@ -120,7 +122,7 @@ server {
 }
 ```
 
-5. Enable both @@fqdn-for-minidlna-dms@@.conf and @@fqdn-for-minidlna-browser@@.conf
+### 5. Enable both @@fqdn-for-minidlna-dms@@.conf and @@fqdn-for-minidlna-browser@@.conf
    **NOTE: i use a python script called [ngx-conf](https://github.com/gnanet/ngx-conf)**
 
     ```
@@ -128,13 +130,13 @@ server {
     ngx-conf -e @@fqdn-for-minidlna-browser@@.conf
     ```
 
-6. Test and load the new nginx configs
+### 6. Test and load the new nginx configs
 
     ```
     nginx -t && nginx -s reload
     ```
 
-7. Ensure php 8.4 and sqlite3 extension is installed
+### 7. Ensure php 8.4 and sqlite3 extension is installed
 
     ```
     apt install php8.4-cli php8.4-sqlite3
