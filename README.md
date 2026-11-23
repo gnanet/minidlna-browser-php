@@ -17,6 +17,11 @@ You will need at least PHP 8.x, php-cli with sqlite3 support, and composer on th
 
 
 2. Use the sample config file `example.env` save it as `.env`, and fill in the variables.
+   BASE_URL:
+    - for LAN 'http://IP-ADDRESS-TO-MINIDLNA:8200/MediaItems/'
+    - for Internet 'http://hostname-proxied-to-minidlna/MediaItems/' ( See [minidlna on a public server](README.public-server.md) )
+
+
     ```
     DATABASE='path-to-the-location-of/files.db'
     BASE_URL ='http://IP-ADDRESS-TO-MINIDLNA:8200/MediaItems/'
@@ -29,6 +34,7 @@ You will need at least PHP 8.x, php-cli with sqlite3 support, and composer on th
     ```
 
     **Optional:** You can set a username and password to protect the minidlna content from unauthorized browsing. **Authentication is enabled only if both values are set**
+
     ```
     DATABASE='path-to-the-location-of/files.db'
     BASE_URL ='http://IP-ADDRESS-TO-MINIDLNA:8200/MediaItems/'
@@ -80,7 +86,11 @@ You will need at least PHP 8.x, php-cli with sqlite3 support, and composer on th
 > 
 > If copy-to-clipboard works, then you dont need to create a certificate for https, possible a self-signed, having to add the signer-cert as trusted CA.
 
-0. Set-up the SSL wrapper
+0. Set in `/etc/hosts` `IP-ADDRESS-TO-MINIDLNA HOSTNAME-OF-CERT`
+
+1. Add the PEM encoded signer certificate (crt file), as trusted CA to your browser
+
+2. Set-up the SSL wrapper
     1. Copy `PROJECT_BASEDIR/stunnel.conf.example` to `PROJECT_BASEDIR/stunnel.conf`
 
     Fill applicable values:
@@ -109,26 +119,22 @@ You will need at least PHP 8.x, php-cli with sqlite3 support, and composer on th
     stunnel4 PROJECT_BASEDIR/stunnel.conf
     ```
 
-1. Start the app with the built-in server of PHP (usually this app should only be used by you) :
+3. Start the app with the built-in server of PHP (usually this app should only be used by you) :
     ```
     $ cd PROJECT_BASEDIR && php -S 0.0.0.0:8290 browser.php 2>&1 | grep -vE " Accepted| Closing"
     ```
-2. Navigate to the URL, replace `IP-ADDRESS-TO-MINIDLNA` with the IP address of your miniDLNA server, or replace `HOSTNAME-OF-CERT` with your choosen hostname
+4. Navigate to the URL, replace `IP-ADDRESS-TO-MINIDLNA` with the IP address of your miniDLNA server, or replace `HOSTNAME-OF-CERT` with your choosen hostname
     ```
     http://IP-ADDRESS-TO-MINIDLNA:8290/ or https://HOSTNAME-OF-CERT:8291/
     ```
-3. Navigate trough the folders structure, to see the content list of the miniDLNA server.
+5. Navigate trough the folders structure, to see the content list of the miniDLNA server.
 
-4. For video and audio media types there are clipboard-icons that you can click to copy either the LAN URL, or if it was set, the URL for Portforwarded connections, which you can use to open them in your mediaplayer of choice.
+6. For video and audio media types there are clipboard-icons that you can click to copy either the LAN URL, or if it was set, the URL for Portforwarded connections, which you can use to open them in your mediaplayer of choice.
 
-## To enable copy-paste in desktop browsers in the same LAN, you need
 
-1. Set in `/etc/hosts` `IP-ADDRESS-TO-MINIDLNA HOSTNAME-OF-CERT`
+## Instructions for `miniDLNA`, and `miniDLNA Database Browser php` to run on public servers
 
-2. Add the PEM encoded signer certificate (crt file), as trusted CA to your browser
-
-3. Visit https://HOSTNAME-OF-CERT:8291/
-
+Read on [Public server README](README.public-server.md)
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments

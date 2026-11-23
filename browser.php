@@ -247,6 +247,7 @@ function browse($object_id = NULL) {
         'root_path' => $root_path,
         'parent_id' => $path_array['PARENT_ID'],
         'path' => $path_array['PATH'],
+        'title_path' => str_replace('/',' / ',str_replace($root_path,'',$path_array['PATH'])),
         'breadcrumbs' => $breadcrumbs_string,
         'items' => $items,
         'BASE_URL' => $app_config['BASE_URL'],
